@@ -1,41 +1,44 @@
+<?php
+$products = $products ?? [];
+$total_products = count($products);
+$total_quantity = 0;
+$inventory_value = 0;
+foreach ($products as $product) {
+    $total_quantity += (int) ($product['quantity'] ?? 0);
+    $inventory_value += (float) ($product['price'] ?? 0) * (int) ($product['quantity'] ?? 0);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Products</title>
+    <title>Product overview</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 30px; }
-        a, button { display: inline-block; padding: 8px 12px; margin: 3px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 18px; }
-        th, td { border: 1px solid #ccc; padding: 9px; text-align: left; }
-        th { background: #263746; color: white; }
+        :root { --blue:#1857d8; --ink:#17243b; --muted:#78859b; --line:#e7edf5; --surface:#fff; --wash:#f5f8fc; --green:#20a76a; }
+        * { box-sizing:border-box; } body { margin:0; background:var(--wash); color:var(--ink); font-family:"Avenir Next", Avenir, Helvetica, Arial, sans-serif; }
+        .app { display:flex; min-height:100vh; } .sidebar { width:220px; flex:0 0 220px; padding:28px 18px; background:var(--surface); border-right:1px solid var(--line); display:flex; flex-direction:column; }
+        .brand { display:flex; align-items:center; gap:10px; margin:0 14px 48px; font-size:20px; font-weight:800; } .brand-mark { width:27px; height:27px; display:grid; place-items:center; color:#fff; background:var(--blue); border-radius:9px; }
+        .nav-label { margin:0 14px 12px; color:#a0aabc; font-size:10px; font-weight:700; letter-spacing:1.1px; text-transform:uppercase; } .nav a,.logout { display:flex; align-items:center; gap:12px; padding:12px 14px; color:#718097; border-radius:9px; text-decoration:none; font-size:13px; font-weight:600; }
+        .nav a.active { color:#fff; background:var(--blue); box-shadow:0 8px 18px rgba(24,87,216,.17); } .nav-symbol { width:18px; text-align:center; font-size:14px; } .logout { margin-top:auto; color:#8793a6; }
+        .main { width:min(1240px,100%); margin:0 auto; padding:30px 42px 44px; } .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; } .eyebrow { margin:0 0 5px; color:var(--muted); font-size:12px; } h1 { margin:0; font-size:27px; letter-spacing:-.7px; }
+        .top-actions { display:flex; align-items:center; gap:16px; } .avatar { width:38px; height:38px; display:grid; place-items:center; border-radius:50%; color:#fff; background:#f08a55; font-weight:800; }
+        .button { display:inline-flex; align-items:center; gap:8px; padding:11px 16px; color:#fff; background:var(--blue); border-radius:8px; text-decoration:none; font-size:12px; font-weight:700; border:0; cursor:pointer; }
+        .metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:15px; margin-bottom:25px; } .metric,.panel { background:var(--surface); border:1px solid var(--line); border-radius:12px; box-shadow:0 7px 24px rgba(34,66,110,.035); } .metric { padding:18px 20px; }
+        .metric-head { display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:11px; font-weight:700; } .metric-dot { width:9px; height:9px; border-radius:50%; background:#3c83ee; } .metric:nth-child(2) .metric-dot{background:#24b47e}.metric:nth-child(3) .metric-dot{background:#f3ad4d}.metric:nth-child(4) .metric-dot{background:#e4657b}
+        .metric strong { display:block; margin-top:12px; font-size:25px; letter-spacing:-.8px; } .metric small { color:var(--green); font-size:10px; font-weight:700; } .content-grid { display:grid; grid-template-columns:minmax(0,1fr) 270px; gap:20px; align-items:start; } .panel { padding:22px; }
+        .panel-heading { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; } h2 { margin:0; font-size:16px; } .panel-heading span { color:var(--muted); font-size:11px; } .inventory { width:100%; border-collapse:collapse; font-size:12px; }
+        .inventory th { padding:11px 8px; color:#9aa6b8; border-bottom:1px solid var(--line); text-align:left; font-size:10px; font-weight:700; text-transform:uppercase; } .inventory td { padding:14px 8px; border-bottom:1px solid #f0f3f7; vertical-align:middle; }
+        .product-name { font-weight:700; } .product-description { max-width:190px; overflow:hidden; color:var(--muted); text-overflow:ellipsis; white-space:nowrap; } .pill { display:inline-block; padding:5px 8px; color:#16875a; background:#e9f8f0; border-radius:5px; font-size:10px; font-weight:700; }
+        .actions { white-space:nowrap; } .actions a { margin-right:8px; color:var(--blue); text-decoration:none; font-size:11px; font-weight:700; } .actions a.delete { color:#d45563; } .empty { padding:28px 8px!important; color:var(--muted); text-align:center; }
+        .notice { padding:22px; color:#fff; background:linear-gradient(145deg,#1749c9,#2178ee); border-radius:12px; box-shadow:0 12px 22px rgba(24,87,216,.18); } .notice b { display:block; margin-bottom:14px; font-size:17px; line-height:1.25; } .notice p { margin:0 0 24px; color:#dbe8ff; font-size:11px; line-height:1.6; } .notice .button { color:var(--blue); background:#fff; }
+        .side-panel { margin-top:20px; } .side-stat { display:flex; justify-content:space-between; padding:13px 0; border-bottom:1px solid var(--line); color:var(--muted); font-size:12px; } .side-stat strong { color:var(--ink); }
+        @media(max-width:900px){.sidebar{width:72px;flex-basis:72px;padding:22px 10px}.brand{justify-content:center;margin:0 0 42px;font-size:0}.nav-label,.nav a span:not(.nav-symbol),.logout span{display:none}.nav a,.logout{justify-content:center}.main{padding:25px 20px}.content-grid{grid-template-columns:1fr}} @media(max-width:650px){.main{padding:20px 14px}.metrics{grid-template-columns:repeat(2,1fr)}.topbar{align-items:flex-start}.top-actions .button{padding:9px;font-size:0}.inventory th:nth-child(3),.inventory td:nth-child(3),.inventory th:nth-child(6),.inventory td:nth-child(6){display:none}.panel{padding:14px}}
     </style>
 </head>
 <body>
-    <h1>Products</h1>
-    <a href="<?= html_escape(site_url('products/create')) ?>">Add Product</a>
-    <a href="<?= html_escape(site_url('logout')) ?>">Logout</a>
-    <table>
-        <thead><tr><th>ID</th><th>Name</th><th>Description</th><th>Price</th><th>Quantity</th><th>Created</th><th>Actions</th></tr></thead>
-        <tbody>
-        <?php if (!empty($products)): foreach ($products as $product): ?>
-            <tr>
-                <td><?= html_escape($product['id']) ?></td>
-                <td><?= html_escape($product['product_name']) ?></td>
-                <td><?= html_escape($product['description']) ?></td>
-                <td><?= html_escape(number_format((float) $product['price'], 2)) ?></td>
-                <td><?= html_escape($product['quantity']) ?></td>
-                <td><?= html_escape($product['created_at']) ?></td>
-                <td>
-                    <a href="<?= html_escape(site_url('products/edit/' . $product['id'])) ?>">Edit</a>
-                    <a href="<?= html_escape(site_url('products/delete/' . $product['id'])) ?>" onclick="return confirm('Delete this product?');">Delete</a>
-                </td>
-            </tr>
-        <?php endforeach; else: ?>
-            <tr><td colspan="7">No products found.</td></tr>
-        <?php endif; ?>
-        </tbody>
-    </table>
-</body>
-</html>
+<div class="app"><aside class="sidebar"><div class="brand"><span class="brand-mark">L</span><span>LavaLust</span></div><p class="nav-label">Workspace</p><nav class="nav"><a class="active" href="<?= html_escape(site_url('products')) ?>"><span class="nav-symbol">&#9632;</span><span>Overview</span></a><a href="<?= html_escape(site_url('products')) ?>"><span class="nav-symbol">&#9776;</span><span>Products</span></a><a href="<?= html_escape(site_url('products/create')) ?>"><span class="nav-symbol">+</span><span>Add product</span></a></nav><a class="logout" href="<?= html_escape(site_url('logout')) ?>"><span class="nav-symbol">&#8599;</span><span>Log out</span></a></aside>
++<main class="main"><header class="topbar"><div><p class="eyebrow">Workspace / Inventory</p><h1>Product overview</h1></div><div class="top-actions"><a class="button" href="<?= html_escape(site_url('products/create')) ?>"><span>+</span> Add product</a><div class="avatar">A</div></div></header>
++<section class="metrics"><div class="metric"><div class="metric-head"><span>Total products</span><i class="metric-dot"></i></div><strong><?= html_escape($total_products) ?></strong><small>Live inventory</small></div><div class="metric"><div class="metric-head"><span>Units in stock</span><i class="metric-dot"></i></div><strong><?= html_escape($total_quantity) ?></strong><small>Available now</small></div><div class="metric"><div class="metric-head"><span>Inventory value</span><i class="metric-dot"></i></div><strong>$<?= html_escape(number_format($inventory_value,2)) ?></strong><small>Current estimate</small></div><div class="metric"><div class="metric-head"><span>System status</span><i class="metric-dot"></i></div><strong>Active</strong><small>Connected to Aiven</small></div></section>
++<section class="content-grid"><div class="panel"><div class="panel-heading"><h2>Recent products</h2><span><?= html_escape($total_products) ?> records</span></div><table class="inventory"><thead><tr><th>Product</th><th>Price</th><th>Description</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead><tbody><?php if(!empty($products)):foreach($products as $product): ?><tr><td class="product-name"><?= html_escape($product['product_name']) ?></td><td>$<?= html_escape(number_format((float)$product['price'],2)) ?></td><td class="product-description"><?= html_escape($product['description']) ?></td><td><?= html_escape($product['quantity']) ?></td><td><span class="pill"><?= (int)$product['quantity']>0?'In stock':'Out of stock' ?></span></td><td class="actions"><a href="<?= html_escape(site_url('products/edit/'.$product['id'])) ?>">Edit</a><a class="delete" href="<?= html_escape(site_url('products/delete/'.$product['id'])) ?>" onclick="return confirm('Delete this product?');">Delete</a></td></tr><?php endforeach;else: ?><tr><td class="empty" colspan="6">No products found. Add your first product to begin.</td></tr><?php endif; ?></tbody></table></div><aside><div class="notice"><b>Keep your inventory organized</b><p>Add accurate product details so your team can track stock and value at a glance.</p><a class="button" href="<?= html_escape(site_url('products/create')) ?>">Create product</a></div><div class="panel side-panel"><div class="panel-heading"><h2>Quick summary</h2></div><div class="side-stat"><span>Database</span><strong>Aiven MySQL</strong></div><div class="side-stat"><span>Table</span><strong>products</strong></div><div class="side-stat"><span>Currency</span><strong>USD</strong></div></div></aside></section></main></div>
++</body></html>

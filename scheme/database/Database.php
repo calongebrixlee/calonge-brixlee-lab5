@@ -279,10 +279,19 @@ class Database {
             if (PHP_VERSION_ID >= 80400 && class_exists('Pdo\\Mysql')) {
                 $options[\Pdo\Mysql::ATTR_SSL_CA] = $ssl_ca;
                 $options[\Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT] = (bool) $ssl_verify;
-            } elseif (defined('PDO::MYSQL_ATTR_SSL_CA')) {
-                $options[PDO::MYSQL_ATTR_SSL_CA] = $ssl_ca;
-                if (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
-                    $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = (bool) $ssl_verify;
+            } else {
+                $ssl_ca_attribute = defined('PDO::MYSQL_ATTR_SSL_CA')
+                    ? constant('PDO::MYSQL_ATTR_SSL_CA')
+                    : null;
+                $ssl_verify_attribute = defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')
+                    ? constant('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')
+                    : null;
+
+                if ($ssl_ca_attribute !== null) {
+                    $options[$ssl_ca_attribute] = $ssl_ca;
+                }
+                if ($ssl_verify_attribute !== null) {
+                    $options[$ssl_verify_attribute] = (bool) $ssl_verify;
                 }
             }
         }

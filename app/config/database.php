@@ -62,10 +62,12 @@ $database['main'] = array(
     'hostname'	=> getenv('DB_HOST') ?: 'localhost',
     'port'		=> getenv('DB_PORT') ?: '3306',
     'username'	=> getenv('DB_USERNAME') ?: 'root',
-    'password'	=> getenv('DB_PASSWORD') ?: '',          // <-- put your actual MySQL password here
+    'password'	=> getenv('DB_PASSWORD') ?: '',
     'database'	=> getenv('DB_DATABASE') ?: 'mydb',
     'charset'	=> 'utf8mb4',
     'dbprefix'	=> '',
+    'ssl_ca'	=> getenv('DB_SSL_CA') ?: ROOT_DIR . 'certs/ca.pem',
+    'ssl_verify'	=> getenv('DB_SSL_VERIFY') !== '0',
     // Optional for SQLite
     'path'      => ''
 );

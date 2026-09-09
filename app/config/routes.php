@@ -49,3 +49,14 @@ $router->get('/welcome', 'Welcome::index');
 
 // Laboratory Exercise No. 4 - Part I: route to the User Management Module
 $router->get('/users', 'UsersController::index');
+
+$router->get('/login', 'AuthController::login');
+$router->post('/login', 'AuthController::login');
+$router->get('/logout', 'AuthController::logout');
+
+$router->get('/products', 'ProductController::index');
+$router->get('/products/create', 'ProductController::create');
+$router->post('/products/create', 'ProductController::store');
+$router->get('/products/edit/{id}', 'ProductController::edit');
+$router->post('/products/edit/{id}', 'ProductController::update');
+$router->get('/products/delete/{id}', 'ProductController::delete');

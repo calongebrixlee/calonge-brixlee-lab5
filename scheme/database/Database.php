@@ -238,6 +238,9 @@ class Database {
             ? $database_config['password']
             : '';
 
+        $ssl_ca = isset($database_config['ssl_ca']) ? $database_config['ssl_ca'] : '';
+        $ssl_verify = $database_config['ssl_verify'] ?? true;
+
         $path = isset($database_config['path']) && !empty($database_config['path'])
             ? $database_config['path']
             : null;
@@ -267,6 +270,16 @@ class Database {
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES   => false,
         );
+
+        if ($driver === 'mysql' && $ssl_ca && defined('PDO::MYSQL_ATTR_SSL_CA')) {
+            if ($ssl_ca[0] !== '/' && !preg_match('/^[A-Za-z]:[\\\\\/]/', $ssl_ca)) {
+                $ssl_ca = ROOT_DIR . ltrim($ssl_ca, '/\\\\');
+            }
+            $options[PDO::MYSQL_ATTR_SSL_CA] = $ssl_ca;
+            if (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
+                $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = (bool) $ssl_verify;
+            }
+        }
 
         try {
             $this->db = new PDO($dsn, $username, $password, $options);

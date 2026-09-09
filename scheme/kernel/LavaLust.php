@@ -235,7 +235,9 @@ if (php_sapi_name() === 'cli') {
     $method = 'GET';
     
 } else {
-    $base  = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+	$base  = PHP_SAPI === 'cli-server'
+		? ''
+		: rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
 	$path  = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 	$url   = $router->sanitize_url(substr($path, strlen($base)) ?: '/');
     $method = isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';

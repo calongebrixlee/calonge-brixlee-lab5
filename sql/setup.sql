@@ -1,6 +1,5 @@
 -- ============================================================
--- Laboratory Exercise No. 4 - Working with Database and MVC
--- Part A, B, C: Database, Table, and Sample Records
+-- Laboratory Exercise No. 5 - Authenticated Product CRUD
 -- ============================================================
 
 -- Part A: Create the database
@@ -16,7 +15,17 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(100) NOT NULL
 );
 
--- Part C: Insert sample records (at least 5)
+-- Part C: Create the product table used by ProductModel
+CREATE TABLE IF NOT EXISTS products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    quantity INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Part D: Insert sample user records (at least 5)
 INSERT INTO users (firstname, lastname, email, username) VALUES
 ('Juan', 'Dela Cruz', 'juan@example.com', 'juandelacruz'),
 ('Maria', 'Santos', 'maria@example.com', 'mariasantos'),
@@ -24,5 +33,10 @@ INSERT INTO users (firstname, lastname, email, username) VALUES
 ('Ana', 'Reyes', 'ana@example.com', 'anareyes'),
 ('Jose', 'Mendoza', 'jose@example.com', 'josemendoza');
 
+-- Optional product sample records
+INSERT INTO products (product_name, description, price, quantity) VALUES
+('Laptop', 'Development laptop', 25000.00, 5),
+('Keyboard', 'Mechanical keyboard', 2500.00, 10);
+
 -- Verify
-SELECT * FROM users;
+SELECT * FROM products;

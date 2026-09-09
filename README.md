@@ -248,6 +248,47 @@ Topics covered include:
 
 ---
 
+## Laboratory Exercise 5
+
+This project includes an authenticated product CRUD application backed by Aiven MySQL.
+
+### Database
+
+Run `sql/setup.sql` in the Aiven MySQL query editor. It creates the `products` table with the required columns.
+
+### Local setup
+
+Export the variables below in your shell, then start the public front controller:
+
+```bash
+export DB_HOST="your-aiven-host"
+export DB_PORT="your-aiven-port"
+export DB_USERNAME="your-aiven-username"
+export DB_PASSWORD="your-aiven-password"
+export DB_DATABASE="mydb"
+export APP_ENV="development"
+export APP_KEY="a-long-random-value"
+export AUTH_USERNAME="admin"
+export AUTH_PASSWORD_HASH="your-password-hash"
+php -S 127.0.0.1:8080 public/index.php
+```
+
+Open `http://127.0.0.1:8080/login`. Product management is protected at `/products`, `/products/create`, `/products/edit/{id}`, and `/products/delete/{id}`.
+
+Generate a password hash with:
+
+```bash
+php -r 'echo password_hash("your-password", PASSWORD_DEFAULT), PHP_EOL;'
+```
+
+### Render deployment
+
+Create a Render Web Service from this repository using the included `Dockerfile`, or use the included `render.yaml` blueprint. Add the Aiven values and authentication settings as Render Environment Variables. Never commit `.env`, Aiven passwords, or the plaintext login password.
+
+### CRUD verification
+
+After login, verify that the product list reads Aiven data, then use Add Product, Edit, and Delete. Confirm the changes with `SELECT * FROM products;` in Navicat.
+
 ## Contributing
 
 Contributions are welcome. To contribute:

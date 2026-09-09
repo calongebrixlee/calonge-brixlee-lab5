@@ -1,7 +1,13 @@
 <?php
+$product = $product ?? null;
+$heading = $heading ?? 'Product';
+$action = $action ?? site_url('products');
+$error = $error ?? null;
+
 $value = function ($key, $default = '') use ($product) {
     if (is_array($product)) return $product[$key] ?? $default;
-    return $product->{$key} ?? $default;
+    if (is_object($product)) return $product->{$key} ?? $default;
+    return $default;
 };
 ?>
 <!DOCTYPE html>

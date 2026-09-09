@@ -44,7 +44,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 */
 /** @var object $router **/
 
-$router->get('/', 'UsersController::index');
+$router->get('/', 'AuthController::login');
 $router->get('/welcome', 'Welcome::index');
 
 // Laboratory Exercise No. 4 - Part I: route to the User Management Module

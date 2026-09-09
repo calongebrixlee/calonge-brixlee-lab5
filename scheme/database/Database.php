@@ -271,13 +271,19 @@ class Database {
             PDO::ATTR_EMULATE_PREPARES   => false,
         );
 
-        if ($driver === 'mysql' && $ssl_ca && defined('PDO::MYSQL_ATTR_SSL_CA')) {
+        if ($driver === 'mysql' && $ssl_ca) {
             if ($ssl_ca[0] !== '/' && !preg_match('/^[A-Za-z]:[\\\\\/]/', $ssl_ca)) {
                 $ssl_ca = ROOT_DIR . ltrim($ssl_ca, '/\\\\');
             }
-            $options[PDO::MYSQL_ATTR_SSL_CA] = $ssl_ca;
-            if (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
-                $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = (bool) $ssl_verify;
+
+            if (PHP_VERSION_ID >= 80400 && class_exists('Pdo\\Mysql')) {
+                $options[\Pdo\Mysql::ATTR_SSL_CA] = $ssl_ca;
+                $options[\Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT] = (bool) $ssl_verify;
+            } elseif (defined('PDO::MYSQL_ATTR_SSL_CA')) {
+                $options[PDO::MYSQL_ATTR_SSL_CA] = $ssl_ca;
+                if (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
+                    $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = (bool) $ssl_verify;
+                }
             }
         }
 

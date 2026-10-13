@@ -139,6 +139,10 @@ class Errors
 		http_response_code(500);
 		
 		if (config_item('environment') !== 'development') {
+			$details = $exception instanceof Throwable ? $exception->getMessage() : $message;
+			error_log('[Database Error] ' . $details);
+			header('Content-Type: text/plain; charset=UTF-8');
+			echo 'The database request failed. Check the application logs for details.';
 			exit();
 		}
 

@@ -140,9 +140,26 @@ class Errors
 		
 		if (config_item('environment') !== 'development') {
 			$details = $exception instanceof Throwable ? $exception->getMessage() : $message;
+			$driver_code = $exception instanceof PDOException
+				? (int) ($exception->errorInfo[1] ?? 0)
+				: 0;
+			$public_message = 'The database request failed. Check the application logs for details.';
+
+			switch ($driver_code) {
+				case 1045:
+					$public_message = 'The database rejected the credentials. Verify DB_HOST, DB_PORT, DB_USERNAME, and DB_PASSWORD in Render.';
+					break;
+				case 1049:
+					$public_message = 'The configured database does not exist. Set DB_DATABASE to the name of an existing database.';
+					break;
+				case 1146:
+					$public_message = 'The products table is missing. Run sql/setup.sql against the database configured by DB_DATABASE.';
+					break;
+			}
+
 			error_log('[Database Error] ' . $details);
 			header('Content-Type: text/plain; charset=UTF-8');
-			echo 'The database request failed. Check the application logs for details.';
+			echo $public_message;
 			exit();
 		}
 

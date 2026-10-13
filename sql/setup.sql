@@ -2,9 +2,8 @@
 -- Laboratory Exercise No. 5 - Authenticated Product CRUD
 -- ============================================================
 
--- Part A: Create the database
-CREATE DATABASE IF NOT EXISTS mydb;
-USE mydb;
+-- Select the same database configured by DB_DATABASE before running this
+-- script. Managed database users may not have permission to create databases.
 
 -- Part B: Create the users table
 CREATE TABLE IF NOT EXISTS users (
@@ -34,9 +33,17 @@ INSERT INTO users (firstname, lastname, email, username) VALUES
 ('Jose', 'Mendoza', 'jose@example.com', 'josemendoza');
 
 -- Optional product sample records
-INSERT INTO products (product_name, description, price, quantity) VALUES
-('Laptop', 'Development laptop', 25000.00, 5),
-('Keyboard', 'Mechanical keyboard', 2500.00, 10);
+INSERT INTO products (product_name, description, price, quantity)
+SELECT 'Laptop', 'Development laptop', 25000.00, 5
+WHERE NOT EXISTS (
+    SELECT 1 FROM products WHERE product_name = 'Laptop'
+);
+
+INSERT INTO products (product_name, description, price, quantity)
+SELECT 'Keyboard', 'Mechanical keyboard', 2500.00, 10
+WHERE NOT EXISTS (
+    SELECT 1 FROM products WHERE product_name = 'Keyboard'
+);
 
 -- Verify
 SELECT * FROM products;
